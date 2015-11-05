@@ -206,7 +206,7 @@ public class MainController {
 		message.setDeletedByReceiver(false);
 		message.setDeletedBySender(false);
 		message = messageRepository.save(message);
-
+//
 		redirect.addFlashAttribute("globalMessage", "Message added successfully");
 		return new ModelAndView("messages/view", "message", message);
 	}
