@@ -1,0 +1,72 @@
+<!-- <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/data/jpa
+    http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+    http://www.springframework.org/schema/jdbc
+    http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <jpa:repositories base-package="mailoc"
+    factory-class="org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean"
+    transaction-manager-ref="jpaTransactionManager"
+    entity-manager-factory-ref="entityManagerFactory" />
+-->
+   <!--  <bean id="myDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://127.0.0.1:3306/my_db3?useUnicode=true&amp;characterEncoding=UTF8&amp;characterSetResults=UTF-8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="1111"/>
+    </bean>
+
+    <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="showSql" value="true"/>
+        <property name="generateDdl" value="false"/>
+        <property name="database" value="MYSQL"/>
+        <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"/>
+    </bean>
+
+
+    <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" autowire="byName">
+        <property name="persistenceXmlLocation" value="classpath:/META-INF/persistence.xml"/>
+        <property name="dataSource" ref="myDataSource"/>
+        <property name="persistenceUnitName" value="MailJPA"/>
+        <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+        <property name="jpaDialect" ref="jpaDialect"/>
+    <property name="packagesToScan" value="mailoc"/>
+    </bean>
+
+        <bean id="jpaTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+               <property name="entityManagerFactory" ref="entityManagerFactory"/>
+               <property name="dataSource" ref="myDataSource"/>
+               <property name="jpaDialect" ref="jpaDialect"/>
+           </bean>
+
+        <tx:annotation-driven transaction-manager="jpaTransactionManager"/>
+        <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+            <bean id="persistenceUnitManager" class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
+                <property name="persistenceXmlLocation" value="classpath:/META-INF/persistence.xml"/>
+                <property name="defaultDataSource" ref="myDataSource"/>
+            </bean>
+            -->
+<!--
+
+    <tx:annotation-driven/>
+    <bean id="messageRepository" class="mailoc.data.MessageRepository">
+        <constructor-arg ref="myDataSource"/>
+    </bean>
+
+    <tx:annotation-driven/>
+    <bean id="userRepository" class="mailoc.data.UserRepository">
+        <constructor-arg ref="myDataSource"/>
+    </bean>
+    </beans>
+-->
+
