@@ -5,9 +5,18 @@
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/my_db4?useUnicode=true&amp;characterEncoding=UTF8&amp;characterSetResults=UTF-8"/>
-            <property name="javax.persistence.jdbc.user" value="root" />
-            <property name="javax.persistence.jdbc.password" value="1111" />
+            <!--
+       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/ochumailoc?useUnicode=true&amp;characterEncoding=UTF8&amp;characterSetResults=UTF-8"/>
+       <property name="javax.persistence.jdbc.user" value="ochumailocuser" />
+       <property name="javax.persistence.jdbc.password" value="zkK9YJC3E" />
+          -->
+        <property name="javax.persistence.jdbc.url" value="jdbc:mysql://127.0.0.1:3306/my_db4?useUnicode=true&amp;characterEncoding=UTF8&amp;characterSetResults=UTF-8"/>
+       <property name="javax.persistence.jdbc.user" value="root" />
+       <property name="javax.persistence.jdbc.password" value="1111" />
+
+     <!--
+
+      -->
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
             <property name="hibernate.show_sql" value="true" />

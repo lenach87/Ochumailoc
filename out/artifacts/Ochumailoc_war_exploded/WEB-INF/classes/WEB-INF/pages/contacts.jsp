@@ -88,7 +88,7 @@
                     <tbody>
                     <tr>
                         <td>
-                            <img width="154" height="200" src="${pageContext.request.contextPath}resources/images/OC.jpg" align="left" />
+                            <img width="154" height="200" src="${rootURL}resources/images/OC.jpg" align="left" />
                             <address>
                                 <h3><strong>Olena Chubukina</strong><br></h3>
                                 <h5>Kyiv, Ukraine<br></h5>

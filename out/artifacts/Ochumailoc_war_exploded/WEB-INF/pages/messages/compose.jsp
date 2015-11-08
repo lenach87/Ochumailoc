@@ -31,7 +31,7 @@
                     <ul class="nav navbar-nav">
                         <li><a href="${rootURL}contacts">Contacts</a></li>
                         <li><a href="${rootURL}incoming"><strong>Mailbox</strong></a></li>
-                        <form class="navbar-form navbar-right" action='${pageContext.request.contextPath}logout' method='POST'>
+                        <form class="navbar-form navbar-right" action='${rootURL}logout' method='POST'>
                             <button type="submit" class="btn btn-primary">
                                 <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
                                 Log out as <sec:authentication property="principal.username"/>
@@ -50,10 +50,10 @@
                class="form-horizontal" role="form" cssStyle="width: 800px; margin: 0 auto;">
 
     <div class="form-group">
-        <label for="receiverUsername" class="col-sm-2 control-label">To</label>
+        <label for="receiverName" class="col-sm-2 control-label">To</label>
         <div class="col-sm-4">
-            <form:input path="receiverUsername" type="text" class="form-control" placeholder="To" autofocus="true"/>
-            <form:errors path="receiverUsername" cssStyle="color: #ff0000;"/>
+            <form:input path="receiverName" type="text" class="form-control" placeholder="To" autofocus="true"/>
+            <form:errors path="receiverName" cssStyle="color: #ff0000;"/>
         </div>
     </div>
     <div class="form-group">
@@ -67,6 +67,7 @@
             <label for="messageText" class="col-sm-2 control-label">Message</label>
             <div class="col-sm-4">
                 <form:textarea class="form-control" path="messageText" rows="5" id="messageText"/>
+                <form:errors path="messageText" cssStyle="color: #ff0000;"/>
                 </div>
             </div>
     <div class="form-group">

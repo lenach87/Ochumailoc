@@ -33,6 +33,12 @@
       text-overflow: ellipsis;
       width: 100%; }
 
+    td.blue span, td.blue span a {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+
   </style>
 </head>
 <body>
@@ -51,7 +57,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li><a href="${rootURL}contacts">Contacts</a></li>
-        <form class="navbar-form navbar-right" action='${pageContext.request.contextPath}logout' method='POST'>
+        <form class="navbar-form navbar-right" action='${rootURL}logout' method='POST'>
           <button type="submit" class="btn btn-primary">
             <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
             Log out as <sec:authentication property="principal.username"/>
@@ -108,7 +114,13 @@
           <c:forEach items="${messages}" var="message">
           <tbody>
           <tr>
-            <td>${message.receiver.getUsername()}</td>
+            <td>
+              <a href="${rootURL}view?id=${message.id}">
+                <div style="height:100%;width:100%">
+                    ${message.receiver.getUsername()}
+                </div>
+              </a>
+            </td>
             <td>${message.summary}</td>
             <td>${message.messageText}</td>
             <td>${message.date}</td>

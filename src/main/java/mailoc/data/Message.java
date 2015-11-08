@@ -1,6 +1,7 @@
 package mailoc.data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -14,6 +15,7 @@ public class Message implements Serializable {
     private Long id;
 
     @Column (nullable = false)
+    @Size(min=1, max=50, message="The summary must be between 1 than 50 characters")
     private String summary;
 
 
@@ -30,10 +32,15 @@ public class Message implements Serializable {
             inverseJoinColumns={@JoinColumn(name="USER_ID")})
     private User sender;
 
+    private String receiverName;
+
+    private String senderName;
+
     @Column
     private String date;
 
     @Column (nullable = false)
+    @Size(min=1, max=1000, message="The message must be between 1 than 1000 characters")
     private String messageText;
 
     @Column(name = "RemovedBySender")
@@ -52,13 +59,15 @@ public class Message implements Serializable {
     }
 
     public Message(Long id, String summary, User receiver, User sender, String date,
-                   String messageText, boolean isRemovedBySender,
+                   String messageText, String receiverName, String senderName, boolean isRemovedBySender,
                    boolean isRemovedByReceiver, boolean deletedByReceiver, boolean deletedBySender) {
 
         this.id=id;
         this.summary = summary;
         this.receiver = receiver;
+        this.receiverName = receiver.getUsername();
         this.sender = sender;
+        this.senderName = sender.getUsername();
         this.date = date;
         this.messageText = messageText;
         this.isRemovedBySender = isRemovedBySender;
@@ -72,7 +81,9 @@ public class Message implements Serializable {
         this.id=id;
         this.summary = summary;
         this.receiver = receiver;
+        this.receiverName = receiver.getUsername();
         this.sender = sender;
+        this.senderName = sender.getUsername();
         this.date = date;
         this.messageText = messageText;
         this.isRemovedBySender = false;
@@ -134,6 +145,22 @@ public class Message implements Serializable {
 
     public void setDeletedByReceiver(boolean deletedByReceiver) {
         this.deletedByReceiver = deletedByReceiver;
+    }
+
+    public String getReceiverName() {
+        return receiverName;
+    }
+
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 }
 

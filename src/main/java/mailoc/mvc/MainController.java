@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -136,6 +137,23 @@ public class MainController {
 
 		Message message = messageRepository.findById(id);
 
+		if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
+				&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
+			message.setIsRemovedByReceiver(true);
+			message.setIsRemovedBySender(true);
+			messageRepository.saveAndFlush(message);
+			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+			return new ModelAndView("redirect:/incoming");
+		}
+
+		else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
+				&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
+
+				messageRepository.delete(message);
+
+			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+			return new ModelAndView("redirect:/deleted");
+		}
 
 		if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
 			message.setIsRemovedByReceiver(true);
@@ -176,30 +194,41 @@ public class MainController {
 	}
 
 	@RequestMapping(value = "/compose", method = RequestMethod.GET)
-	public String composeForm(@ModelAttribute MessageForm messageForm) {
+	public String composeForm(Model model) { //@ModelAttribute MessageForm messageForm) {
+		Message messageForm = new Message();
+		model.addAttribute("messageForm", messageForm);
+
 		return "messages/compose";
 	}
 
 	@RequestMapping(value = "/compose", method = RequestMethod.POST)
 	@Transactional
-	public ModelAndView compose(@CurrentUser User currentUser, @Valid MessageForm messageForm, BindingResult result,
-								RedirectAttributes redirect) {
-		User to = userRepository.findUserByUsername(messageForm.getReceiverUsername());
+	public ModelAndView compose(@CurrentUser User currentUser, @ModelAttribute("messageForm") @Valid Message messageForm, BindingResult result,
+								ModelMap model, RedirectAttributes redirect) {
+
+
+			model.addAttribute("receiverName",messageForm.getReceiverName());
+			model.addAttribute("summary",messageForm.getSummary());
+			model.addAttribute("messageText",messageForm.getMessageText());
+
+		User to = userRepository.findUserByUsername(messageForm.getReceiverName());
 		if (to == null) {
-			result.rejectValue("receiverId", "receiverId", "User not found");
+			result.rejectValue("receiverName", "receiverName", "User not found");
 		}
 		if (result.hasErrors()) {
 			return new ModelAndView("messages/compose");
 		}
 
 		Message message = new Message();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		Date date = new Date();
 		String messageDate = dateFormat.format(date);
 		message.setSummary(messageForm.getSummary());
 		message.setMessageText(messageForm.getMessageText());
 		message.setDate(messageDate);
 		message.setReceiver(to);
+		message.setSenderName(currentUser.getUsername());
+		message.setReceiverName(to.getUsername());
 		message.setSender(currentUser);
 		message.setIsRemovedBySender(false);
 		message.setIsRemovedByReceiver(false);
@@ -212,9 +241,9 @@ public class MainController {
 	}
 
 	@RequestMapping(value = "/reply", method = RequestMethod.GET)
-	public String replyForm(@RequestParam(value = "id") Long id, @ModelAttribute MessageForm messageForm) {
+	public String replyForm(@RequestParam(value = "id") Long id, @ModelAttribute("messageForm") @Valid Message messageForm) {
 		Message message = messageRepository.findById(id);
-		messageForm.setReceiverUsername(message.getSender().getUsername());
+		messageForm.setReceiverName(message.getSender().getUsername());
 		messageForm.setSummary("RE: " + message.getSummary());
 		return "messages/compose";
 	}

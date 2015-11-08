@@ -40,7 +40,7 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
         <li><a href="${rootURL}contacts">Contacts</a></li>
-        <form class="navbar-form navbar-right" action='${pageContext.request.contextPath}logout' method='POST'>
+        <form class="navbar-form navbar-right" action='${rootURL}logout' method='POST'>
           <button type="submit" class="btn btn-primary">
             <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
             Log out as <sec:authentication property="principal.username"/>

@@ -31,12 +31,12 @@ public class User {
     private String lastName;
 
     @Column(unique = true)
-    @Pattern (regexp = "^([a-z0-9_\\.-]+)@([a-z0-9_\\.-]+)\\.([a-z\\.]{2,6})$", message = "Please enter a valid email.")
+    @Pattern (regexp = "^([a-zA-Z0-9_\\.-]+)@([a-z0-9_\\.-]+)\\.([a-z\\.]{2,6})$", message = "Please enter a valid email.")
     @NotEmpty (message = "Email is required.")
     private String email;
 
     @Column(unique = true)
-    @Pattern (regexp = "^[a-z0-9_-]{6,30}$", message = "Username shall consist of 6-30 English letters, numbers and may contain _ or - signs")
+    @Pattern (regexp = "^[a-zA-Z0-9_-]{6,30}$", message = "Username shall consist of 6-30 English letters, numbers and may contain _ or - signs")
     @NotEmpty (message = "Login is required.")
     private String username;
 
