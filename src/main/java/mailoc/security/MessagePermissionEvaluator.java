@@ -25,10 +25,7 @@ public class MessagePermissionEvaluator implements PermissionEvaluator {
         }
 
         User currentUser = (User) authentication.getPrincipal();
-        if ((currentUser.getUsername().equals((message.getSender().getUsername()))) || (currentUser.getUsername().equals((message.getReceiver().getUsername()))))
-        return true;
-        else
-            return false;
+        return (currentUser.getUsername().equals((message.getSender().getUsername()))) || (currentUser.getUsername().equals((message.getReceiver().getUsername())));
     }
 
     @Override

@@ -6,6 +6,7 @@ import mailoc.data.User;
 import mailoc.data.UserRepository;
 import mailoc.security.CurrentUser;
 import mailoc.security.SecurityUser;
+import mailoc.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -40,10 +41,17 @@ public class MainController {
 	private final MessageRepository messageRepository;
 	private final UserRepository userRepository;
 
+
 	@Autowired
 	public MainController(MessageRepository messageRepository, UserRepository userRepository) {
 		this.messageRepository = messageRepository;
 		this.userRepository = userRepository;
+	}
+	private static MessageService messageService;
+
+	@Autowired
+	public void setMessageService(MessageService messageService) {
+		MainController.messageService = messageService;
 	}
 
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
@@ -87,7 +95,7 @@ public class MainController {
 
 	@RequestMapping(value = "/incoming", method = RequestMethod.GET)
 	public ModelAndView listIncoming(@CurrentUser User currentUser) {
-		Iterable<Message> incoming = messageRepository.findByReceiverId(currentUser.getId());
+		Iterable<Message> incoming = messageRepository.findByReceiver(currentUser);
 		ArrayList<Message> messages = new ArrayList<Message>();
 		for (Message element : incoming) {
 			if (!element.isIsRemovedByReceiver() && !element.isDeletedByReceiver()) {
@@ -99,19 +107,14 @@ public class MainController {
 
 	@RequestMapping(value = "/outgoing", method = RequestMethod.GET)
 	public ModelAndView listOutgoing(@CurrentUser User currentUser) {
-		Iterable<Message> outgoing = messageRepository.findBySenderId(currentUser.getId());
-		ArrayList<Message> messages = new ArrayList<Message>();
-		for (Message element : outgoing) {
-			if ((!element.isIsRemovedBySender()) && (!element.isDeletedBySender())) {
-				messages.add(element);
-			}
-		}
+
+		Iterable <Message> messages = messageService.listOutgoing(currentUser);
 		return new ModelAndView("messages/outgoing", "messages", messages);
 	}
 
 	@RequestMapping(value = "/deleted", method = RequestMethod.GET)
 	public ModelAndView listDeleted(@CurrentUser User currentUser) {
-		Iterable<Message> allMessages = messageRepository.findByReceiverIdOrSenderId(currentUser.getId(), currentUser.getId());
+		Iterable<Message> allMessages = messageRepository.findByReceiverOrSender(currentUser, currentUser);
 		ArrayList<Message> deletedMessages = new ArrayList<Message>();
 		for (Message element : allMessages) {
 			if ((element.isIsRemovedBySender()) && (Objects.equals(element.getSender().getId(), currentUser.getId()))) {
@@ -132,65 +135,70 @@ public class MainController {
 
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	@Transactional
-	public ModelAndView deleteMessage(@RequestParam(value = "id") Long id, RedirectAttributes redirect,
+	public ModelAndView deleteMessage(//@RequestParam(value = "id") Long id,
+									  @RequestParam("recycleCheckBox") String[] checkboxes, RedirectAttributes redirect,
 									  @CurrentUser SecurityUser currentUser) {
 
-		Message message = messageRepository.findById(id);
+		List<Long> ids = new ArrayList<>();
+		if (null != checkboxes) {
+			for (String id : checkboxes) {
+				ids.add(Long.parseLong(id));
+				Message message = messageRepository.findById(Long.parseLong(id));
 
-		if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
-				&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
-			message.setIsRemovedByReceiver(true);
-			message.setIsRemovedBySender(true);
-			messageRepository.saveAndFlush(message);
-			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-			return new ModelAndView("redirect:/incoming");
-		}
+				if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
+						&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
+					message.setIsRemovedByReceiver(true);
+					message.setIsRemovedBySender(true);
+					messageRepository.saveAndFlush(message);
+					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+					return new ModelAndView("redirect:/incoming");
+				} else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
+						&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
 
-		else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
-				&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
+					messageRepository.delete(message);
 
-				messageRepository.delete(message);
+					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+					return new ModelAndView("redirect:/deleted");
+				}
 
-			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-			return new ModelAndView("redirect:/deleted");
-		}
+				if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
+					message.setIsRemovedByReceiver(true);
+					messageRepository.saveAndFlush(message);
+					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+					return new ModelAndView("redirect:/incoming");
+				} else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
+					message.setIsRemovedByReceiver(false);
+					message.setDeletedByReceiver(true);
+					message = messageRepository.saveAndFlush(message);
+					if ((message.isDeletedBySender()) && (message.isDeletedByReceiver())) {
+						messageRepository.delete(message);
+					}
+					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+					return new ModelAndView("redirect:/deleted");
+				}
 
-		if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
-			message.setIsRemovedByReceiver(true);
-			messageRepository.saveAndFlush(message);
-			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-			return new ModelAndView("redirect:/incoming");
-		}
-
-		else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
-			message.setIsRemovedByReceiver(false);
-			message.setDeletedByReceiver(true);
-			message = messageRepository.saveAndFlush(message);
-			if ((message.isDeletedBySender()) && (message.isDeletedByReceiver())) {
-				messageRepository.delete(message);
+				if ((!message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId()))) {
+					message.setIsRemovedBySender(true);
+					messageRepository.saveAndFlush(message);
+					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+					return new ModelAndView("redirect:/outgoing");
+				} else //((message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId())))
+				{
+					message.setIsRemovedBySender(false);
+					message.setDeletedBySender(true);
+					message = messageRepository.saveAndFlush(message);
+					if ((message.isDeletedBySender()) && (message.isDeletedByReceiver())) {
+						messageRepository.delete(message);
+					}
+					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
+					return new ModelAndView("redirect:/deleted");
+				}
 			}
-			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-			return new ModelAndView("redirect:/deleted");
 		}
-
-		if ((!message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId()))) {
-			message.setIsRemovedBySender(true);
-			messageRepository.saveAndFlush(message);
-			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-			return new ModelAndView("redirect:/outgoing");
+		else {
+			return null;
 		}
-
-		else //((message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId())))
-			{
-			message.setIsRemovedBySender(false);
-			message.setDeletedBySender(true);
-			message = messageRepository.saveAndFlush(message);
-			if ((message.isDeletedBySender()) && (message.isDeletedByReceiver())) {
-				messageRepository.delete(message);
-			}
-			redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-			return new ModelAndView("redirect:/deleted");
-		}
+		return new ModelAndView("redirect:/incoming");
 	}
 
 	@RequestMapping(value = "/compose", method = RequestMethod.GET)
@@ -248,41 +256,7 @@ public class MainController {
 		return "messages/compose";
 	}
 }
-/*/
-	@RequestMapping(value = "/reply", method=RequestMethod.POST)
-	@Transactional
-	public ModelAndView reply(@CurrentUser User currentUser, @Valid MessageForm messageForm, BindingResult result,
-							  RedirectAttributes redirect) {
-		User to = userRepository.findUserByUsername(messageForm.getReceiverUsername());
-		if(to == null) {
-			result.rejectValue("receiverUsername","receiverUsername", "User not found");
-		}
-		if(result.hasErrors()) {
-			return new ModelAndView("messages/compose");
-		}
 
-		Message message = new Message();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-		Date date = new Date();
-		String messageDate = dateFormat.format(date);
-		message.setSummary(messageForm.getSummary());
-		message.setMessageText(messageForm.getMessageText());
-		message.setDate(messageDate);
-		message.setReceiver(to);
-		message.setSender(currentUser);
-		message.setIsRemovedBySender(false);
-		message.setIsRemovedByReceiver(false);
-		message.setDeletedByReceiver(false);
-		message.setDeletedBySender(false);
-		message = messageRepository.save(message);
-		if (to != null) {
-			to.getIncoming().add(message);
-		}
-		currentUser.getOutgoing().add(message);
-		redirect.addFlashAttribute("globalMessage", "Message added successfully");
-		return new ModelAndView("redirect:/{message.id}", "message.id", message.getId());
-	}
-*/
 
 
 

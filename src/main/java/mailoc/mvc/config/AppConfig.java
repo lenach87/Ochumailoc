@@ -52,9 +52,9 @@ public class AppConfig extends WebMvcConfigurerAdapter {
     public DriverManagerDataSource myDataSource() {
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        driverManagerDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/my_db4?useUnicode=true&amp;characterEncoding=UTF8&amp;characterSetResults=UTF-8");
-        driverManagerDataSource.setUsername("root");
-        driverManagerDataSource.setPassword("1111");
+        driverManagerDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/ochumailoc?useUnicode=true&amp;characterEncoding=UTF8&amp;characterSetResults=UTF-8");
+        driverManagerDataSource.setUsername("ochumailocuser");
+        driverManagerDataSource.setPassword("zkK9YJC3E");
 
         return driverManagerDataSource;
     }
@@ -107,7 +107,7 @@ public class AppConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers( final ResourceHandlerRegistry registry ) {
-        registry.addResourceHandler("/resources/**").addResourceLocations("classpath:/resources/");
+        registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
     }
 

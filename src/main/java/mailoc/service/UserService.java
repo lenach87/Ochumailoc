@@ -2,8 +2,11 @@ package mailoc.service;
 
 
 
+import java.util.ArrayList;
 import java.util.List;
 
+import mailoc.data.Message;
+import mailoc.security.CurrentUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +19,6 @@ import mailoc.data.UserRepository;
 @Transactional
 public class UserService
 {
-  //  public UserService() {
-  //  }
 
     @Autowired
     private UserRepository userRepository;
