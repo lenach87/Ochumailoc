@@ -53,24 +53,37 @@
   </div>
 </nav>
 
-<p class="inner cover">
-<h3 class="cover-heading"></h3>
-<p class="col-md-6 col-md-offset-2">
-  <c:if test="${param.error == null}">
-<div class="alert alert-success">
-  You have successfully signed up!
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-9 col-sm-offset-1 col-md-10 col-md-offset-1 main">
+
+
+      <div class="row placeholders">
+        <div class="col-xs-6 col-sm-3 placeholder">
+        </div>
+        <div class="col-xs-6 col-sm-3 placeholder">
+        </div>
+        <div class="col-xs-6 col-sm-3 placeholder">
+        </div>
+        <div class="col-xs-6 col-sm-3 placeholder">
+        </div>
+      </div>
+      <p class="inner cover">
+      <h3 class="cover-heading"></h3>
+      <p class="col-md-6 col-md-offset-2">
+        <c:if test="${param.error == null}">
+      <div class="alert alert-success">
+        You have successfully signed up!
+      </div>
+      </c:if>
+
+
+                <h2> Welcome, <sec:authentication property="principal.username"/> </h2>
+                <h4> Enjoy yourself with <a href="${rootURL}incoming"><strong>OChuMail</strong></a>! </h4>
+
+    </div>
+  </div>
 </div>
-</c:if>
-
-
-  <div class="jumbotron">
-    <h2> Welcome, <sec:authentication property="principal.username"/> </h2>
-
-    <h4> Enjoy yourself with OChuMail! </h4>
-
-
-  </div>
-  </div>
 
 </body>
 </html>

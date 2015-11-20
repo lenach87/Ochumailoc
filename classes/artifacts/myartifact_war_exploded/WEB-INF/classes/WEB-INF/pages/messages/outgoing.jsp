@@ -71,8 +71,10 @@
           <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </form>
       </ul>
-      <form class="navbar-form navbar-right">
-        <input type="text" class="form-control" placeholder="Search...">
+      <form class="navbar-form navbar-right" action="${rootURL}search" method="post">
+        <div class="form-group">
+          <input type="text" class="form-control" name="pattern" placeholder="Search...">
+        </div>
       </form>
     </div>
   </div>

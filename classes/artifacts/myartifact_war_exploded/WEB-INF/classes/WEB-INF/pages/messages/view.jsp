@@ -140,12 +140,6 @@
       </form>
       </dt>
       <dd>
-      <form class="form-inline" action='${rootURL}delete?id=${message.id}' method='POST'>
-        <button type="submit" class="btn btn-primary" name="id" value="${message.id}">
-          <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
-          Delete
-        </button>
-      </form>
       </dd>
     </dl>
 </div>

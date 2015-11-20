@@ -129,6 +129,18 @@ public class MainController {
 		return new ModelAndView("messages/view", "message", message);
 	}
 
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	public ModelAndView searchIncoming (@CurrentUser User currentUser, @RequestParam(value = "pattern") String pattern) {
+		Iterable<Message> allByPattern = messageRepository.findByMessageTextOrSummaryContainingIgnoreCase(pattern, pattern);
+		ArrayList<Message> messages = new ArrayList<Message>();
+		for (Message element : allByPattern) {
+				messages.add(element);
+		}
+
+		Collections.sort(messages, Collections.reverseOrder());
+		return new ModelAndView("messages/incoming", "messages", messages);
+	}
+
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	@Transactional
 	public ModelAndView deleteMessage(//@ModelAttribute("messageForm") MessageForm messageForm, Model model,
@@ -146,7 +158,7 @@ public class MainController {
 			}
 		}
 
-		final List<Message> selectedList = new ArrayList<Message> ();
+		List<Message> selectedList = new ArrayList<Message> ();
 		for (Long id:ids) {
 			selectedList.add(messageRepository.findById(id));
 		}

@@ -27,5 +27,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Iterable<Message>findByReceiverOrSender(User id, User id2);
 
+    Iterable<Message>findByMessageTextOrSummaryContainingIgnoreCase(String id, String id2);
+
 
 }
