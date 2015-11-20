@@ -22,7 +22,46 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <link href="http://getbootstrap.com/examples/dashboard/dashboard.css" rel="stylesheet">
+  <style type="text/css">
+    td { line-height: 1em;
+      height: 1em;
+      overflow: hidden;
+      word-wrap: break-word;
+      text-overflow: ellipsis;
+      font-size: 15px;
+      font-family: arial, sans-serif;
+    }
 
+    table {
+      line-height: 1em;
+      height: 1em;
+      overflow: hidden;
+      word-wrap: break-word;
+      text-overflow: ellipsis;
+      width: 100%;
+      font-size: 15px;
+      font-family: arial, sans-serif;}
+
+    td.blue span, td.blue span a {
+      display: block;
+      height: 100%;
+      width: 100%;
+
+    }
+    dl {
+      font-size: 15px;
+      font-family: arial, sans-serif;
+    }
+    dt {
+      font-size: 15px;
+      font-family: arial, sans-serif;
+    }
+    dd {
+      font-size: 15px;
+      font-family: arial, sans-serif;
+    }
+
+  </style>
 
     </head>
 <body>

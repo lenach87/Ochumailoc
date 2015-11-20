@@ -1,35 +1,21 @@
 package mailoc.mvc;
 
 import mailoc.data.*;
-import mailoc.data.MessageForm;
 import mailoc.security.CurrentUser;
 import mailoc.security.SecurityUser;
 import mailoc.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.naming.NamingException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.beans.PropertyEditorSupport;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -103,15 +89,22 @@ public class MainController {
 				messages.add(element);
 			}
 		}
+		Collections.sort(messages, Collections.reverseOrder());
 		return new ModelAndView("messages/incoming", "messages", messages);
 	}
 
 	@RequestMapping(value = "/outgoing", method = RequestMethod.GET)
 	public ModelAndView listOutgoing(@CurrentUser User currentUser) {
 
-		MessageForm messageForm = messageService.listOutgoing(currentUser);
-
-		return new ModelAndView("messages/outgoing", "messageForm", messageForm);
+		Iterable <Message> outgoing = messageRepository.findBySender(currentUser);
+		ArrayList<Message> messages = new ArrayList<Message>();
+		for (Message element : outgoing) {
+			if (!element.isIsRemovedBySender() && !element.isDeletedBySender()) {
+				messages.add(element);
+			}
+		}
+		Collections.sort(messages, Collections.reverseOrder());
+		return new ModelAndView("messages/outgoing", "messages", messages);
 	}
 
 	@RequestMapping(value = "/deleted", method = RequestMethod.GET)
@@ -126,6 +119,7 @@ public class MainController {
 				deletedMessages.add(element);
 			}
 		}
+		Collections.sort(deletedMessages, Collections.reverseOrder());
 		return new ModelAndView("messages/deleted", "deletedMessages", deletedMessages);
 	}
 
@@ -137,13 +131,28 @@ public class MainController {
 
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	@Transactional
-	public ModelAndView deleteMessage(@ModelAttribute("messageForm") MessageForm messageForm, Model model,
+	public ModelAndView deleteMessage(//@ModelAttribute("messageForm") MessageForm messageForm, Model model,
+									  // @RequestParam(value = "messageIds") String[] messageIds,
+									  HttpServletRequest request,
 									  RedirectAttributes redirect,
 									  @CurrentUser SecurityUser currentUser) {
-		List<Message> selectedList = messageForm.getMessageList(); //returns null
 
-		if (selectedList == null) {
-			redirect.addAttribute("globalMessage", "Select messages to be deleted");
+
+		final String[] checkboxes = request.getParameterValues("messageIds");
+		List<Long> ids = new ArrayList<>();
+		if (null != checkboxes) {
+			for (String s : checkboxes) {
+				ids.add(Long.parseLong(s));
+			}
+		}
+
+		final List<Message> selectedList = new ArrayList<Message> ();
+		for (Long id:ids) {
+			selectedList.add(messageRepository.findById(id));
+		}
+
+		if (selectedList.isEmpty()) {
+			return new ModelAndView("redirect:/deleted");
 		}
 		else {
 			for(Message message : selectedList) {
@@ -184,8 +193,9 @@ public class MainController {
 					messageRepository.saveAndFlush(message);
 					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
 					return new ModelAndView("redirect:/outgoing");
-				} else //((message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId())))
-				{
+				}
+				else //((message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId())))
+					{
 					message.setIsRemovedBySender(false);
 					message.setDeletedBySender(true);
 					message = messageRepository.saveAndFlush(message);
@@ -196,7 +206,7 @@ public class MainController {
 					return new ModelAndView("redirect:/deleted");
 				}
 			}
-			}
+		}
 		return new ModelAndView("redirect:/");
 	}
 

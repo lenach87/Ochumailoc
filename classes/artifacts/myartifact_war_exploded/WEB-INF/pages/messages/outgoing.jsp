@@ -24,6 +24,8 @@
       overflow: hidden;
       word-wrap: break-word;
       text-overflow: ellipsis;
+      font-size: 15px;
+      font-family: arial, sans-serif;
        }
 
     table {
@@ -32,12 +34,15 @@
       overflow: hidden;
       word-wrap: break-word;
       text-overflow: ellipsis;
-      width: 100%; }
+      width: 100%;
+      font-size: 15px;
+      font-family: arial, sans-serif;}
 
     td.blue span, td.blue span a {
       display: block;
       height: 100%;
       width: 100%;
+
     }
 
   </style>
@@ -84,7 +89,7 @@
       </ul>
     </div>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-      <c:if test="${empty messageForm.getMessageList()}">
+      <c:if test="${empty messages}">
         <thead>
 
         <h4><p class="bg-primary"> You have not sent any messages yet</p></h4>
@@ -93,7 +98,7 @@
       </c:if>
       <h2 class="sub-header">Outgoing messages</h2>
       <div class="table-responsive">
-
+        <form class="form-inline" action="${rootURL}delete" method="post">
         <table class="table table-striped">
           <colgroup>
             <col span="1" style="width: 8%;">
@@ -106,12 +111,12 @@
           <thead>
           <tr>
             <td>
-              <form:form class="form-inline" action="${rootURL}delete" method="post" modelAttribute="messageForm">
+
                 <button type="submit" class="btn btn-primary">
                   <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
                   Delete
                 </button>
-              </form:form>
+
             </td>
             <td><b></b></td>
             <td><b></b></td>
@@ -121,11 +126,13 @@
           </tr>
           </thead>
 
-          <c:if test="${messageForm.getMessageList() != null}">
-          <c:forEach items="${messageForm.getMessageList()}" var="message" varStatus="status">
+          <c:if test="${messages != null}">
+          <c:forEach items="${messages}" var="message">
           <tbody>
           <tr>
-            <td> <form:checkbox path="messageList[${status.index}]" value="messageList[${status.index}].id"/></td>
+            <td>
+              <input type = "checkbox" name = "messageIds" value = "${message.id}" /> <c:out value = " " />
+</td>
             <td>
               <a href="${rootURL}view?id=${message.id}">
                 <div style="height:100%;width:100%">
@@ -143,7 +150,7 @@
           </c:if>
           </tbody>
         </table>
-
+</form>
       </div>
     </div>
   </div>

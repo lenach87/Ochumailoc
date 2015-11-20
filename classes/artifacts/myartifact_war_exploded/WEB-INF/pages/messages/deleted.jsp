@@ -17,7 +17,35 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <link href="http://getbootstrap.com/examples/dashboard/dashboard.css" rel="stylesheet">
-</head>
+
+  <style type="text/css">
+    td { line-height: 1em;
+      height: 1em;
+      overflow: hidden;
+      word-wrap: break-word;
+      text-overflow: ellipsis;
+      font-size: 15px;
+      font-family: arial, sans-serif;
+    }
+
+    table {
+      line-height: 1em;
+      height: 1em;
+      overflow: hidden;
+      word-wrap: break-word;
+      text-overflow: ellipsis;
+      width: 100%;
+      font-size: 15px;
+      font-family: arial, sans-serif;}
+
+    td.blue span, td.blue span a {
+      display: block;
+      height: 100%;
+      width: 100%;
+
+    }
+
+  </style>
 <body>
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -72,21 +100,28 @@
 
       <h2 class="sub-header">Deleted messages</h2>
       <div class="table-responsive">
+        <form class="form-inline" action="${rootURL}delete" method="post">
         <table class="table table-striped">
           <colgroup>
-            <col span="1" style="width: 10%;">
+            <col span="1" style="width: 8%;">
             <col span="1" style="width: 15%;">
-            <col span="1" style="width: 40%;">
+            <col span="1" style="width: 17%;">
+            <col span="1" style="width: 35%;">
             <col span="1" style="width: 15%;">
-            <col span="1" style="width: 10%;">
+
           </colgroup>
           <thead>
           <tr>
-            <td><b>Sender</b></td>
-            <td><b>Summary</b></td>
-            <td><b>Message</b></td>
-            <td><b>Date</b></td>
-            <td><b>Action</b></td>
+            <td>
+              <button type="submit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
+                Delete
+              </button>
+            </td>
+            <td><b></b></td>
+            <td><b></b></td>
+            <td><b></b></td>
+            <td><b></b></td>
           </tr>
           </thead>
           <c:if test="${deletedMessages == null}">
@@ -96,24 +131,21 @@
           <c:forEach items="${deletedMessages}" var="message">
           <tbody>
           <tr>
-            <td><input type="checkbox" name="restoreCheckBox" value="${message.id}"></td>
+            <td>
+              <input type = "checkbox" name = "messageIds" value = "${message.id}" /> <c:out value = " " />
+            </td>
             <td>${message.sender.getUsername()}</td>
             <td>${message.summary}</td>
             <td>${message.messageText}</td>
             <td>${message.date}</td>
             <td>
-              <form class="form-inline" action='${rootURL}delete?id=${message.id}' method='POST'>
-                <button type="submit" class="btn btn-primary">
-                  <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
-                  Delete
-                </button>
-              </form>
             </td>
           </tr>
           </c:forEach>
           </c:if>
           </tbody>
         </table>
+        </form>
       </div>
     </div>
   </div>

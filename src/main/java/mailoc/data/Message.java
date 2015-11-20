@@ -3,12 +3,13 @@ package mailoc.data;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Set;
 
 @Entity
 @Table(name = "Messages")
-public class Message implements Serializable {
+public class Message implements Serializable, Comparable<Message> {
     @Id
     @GeneratedValue
     @Column (name = "Message_ID")
@@ -161,6 +162,27 @@ public class Message implements Serializable {
 
     public void setSenderName(String senderName) {
         this.senderName = senderName;
+    }
+
+    public int compareTo(Message p)
+    {
+        return getId().compareTo(p.getId());
+    }
+
+    static class MessageComparator implements Comparator<Message>
+    {
+        public int compare(Message p1, Message p2)
+        {
+            Long id1 = p1.getId();
+            Long id2 = p2.getId();
+
+            if (id1 == id2)
+                return 0;
+            else if (id1 > id2)
+                return 1;
+            else
+                return -1;
+        }
     }
 }
 
