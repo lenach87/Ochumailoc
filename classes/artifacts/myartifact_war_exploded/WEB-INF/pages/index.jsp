@@ -49,18 +49,48 @@
                     <li><a href="${rootURL}incoming"><strong>Mailbox</strong></a></li>
                 </c:if>
             </ul>
-
         </div>
     </div>
 </nav>
 
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9 col-sm-offset-1 col-md-10 col-md-offset-1 main">
+
+            <div class="row placeholders">
+                <div class="col-xs-6 col-sm-3 placeholder">
+                </div>
+                <div class="col-xs-6 col-sm-3 placeholder">
+                </div>
+                <div class="col-xs-6 col-sm-3 placeholder">
+                </div>
+                <div class="col-xs-6 col-sm-3 placeholder">
+                </div>
+            </div>
+            <p class="inner cover">
+            <h3 class="cover-heading"></h3>
+            <p class="col-md-6 col-md-offset-2">
+            <c:if test="${param.error == null}">
+                <div class="alert alert-success">
+                    You successfully logged in!
+                </div>
+            </c:if>
+            </p>
+            <div class="jumbotron">
 
 
-    <div class="jumbotron">
-        <h2> Welcome, <sec:authentication property="principal.username"/>! </h2>
-        <h4> Enjoy yourself with OChuMail! </h4>
+                    <h2> Welcome, <sec:authentication property="principal.username"/> </h2>
 
+
+                    <h5> Enjoy yourself with OChuMail! </h5>
+                    <p>
+                        <a class="btn btn-lg btn-primary" href="${pageContext.request.contextPath}incoming" role="button">Mailbox</a>
+                    </p>
+
+            </div>
+        </div>
     </div>
 </div>
+
 </body>
 </html>
