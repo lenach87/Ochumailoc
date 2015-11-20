@@ -84,7 +84,7 @@
       </ul>
     </div>
     <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-      <c:if test="${empty messages}">
+      <c:if test="${empty messageForm.getMessageList()}">
         <thead>
 
         <h4><p class="bg-primary"> You have not sent any messages yet</p></h4>
@@ -93,35 +93,39 @@
       </c:if>
       <h2 class="sub-header">Outgoing messages</h2>
       <div class="table-responsive">
+
         <table class="table table-striped">
           <colgroup>
-            <col span="1" style="width: 10%;">
+            <col span="1" style="width: 8%;">
             <col span="1" style="width: 15%;">
-            <col span="1" style="width: 40%;">
+            <col span="1" style="width: 17%;">
+            <col span="1" style="width: 35%;">
             <col span="1" style="width: 15%;">
-            <col span="1" style="width: 10%;">
+
           </colgroup>
           <thead>
           <tr>
-            <td><b>&nbsp;</b></td>
-            <td><b>Receiver</b></td>
-            <td><b>Summary</b></td>
-            <td><b>Message</b></td>
-            <td><b>Date</b></td>
-            <td><b> <form class="form-inline" action='${rootURL}delete' method='POST'>
-              <button type="submit" class="btn btn-primary">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
-                Delete
-              </button>
-            </form></b></td>
+            <td>
+              <form:form class="form-inline" action="${rootURL}delete" method="post" modelAttribute="messageForm">
+                <button type="submit" class="btn btn-primary">
+                  <span class="glyphicon glyphicon-trash" aria-hidden="true"> </span>
+                  Delete
+                </button>
+              </form:form>
+            </td>
+            <td><b></b></td>
+            <td><b></b></td>
+            <td><b></b></td>
+            <td><b></b></td>
+
           </tr>
           </thead>
 
-          <c:if test="${messages != null}">
-          <c:forEach items="${messages}" var="message">
+          <c:if test="${messageForm.getMessageList() != null}">
+          <c:forEach items="${messageForm.getMessageList()}" var="message" varStatus="status">
           <tbody>
           <tr>
-            <td> <form:checkbox path="message.isRemovedBySender"/></td>
+            <td> <form:checkbox path="messageList[${status.index}]" value="messageList[${status.index}].id"/></td>
             <td>
               <a href="${rootURL}view?id=${message.id}">
                 <div style="height:100%;width:100%">
@@ -139,6 +143,7 @@
           </c:if>
           </tbody>
         </table>
+
       </div>
     </div>
   </div>

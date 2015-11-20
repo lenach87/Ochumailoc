@@ -2,6 +2,7 @@ package mailoc.service;
 
 
 import mailoc.data.Message;
+import mailoc.data.MessageForm;
 import mailoc.data.MessageRepository;
 
 import mailoc.data.User;
@@ -29,15 +30,17 @@ public class MessageService  {
     }
 
 
-    public Iterable<Message> listOutgoing (User currentUser) {
+    public MessageForm listOutgoing (User currentUser) {
         Iterable<Message> outgoing = messageRepository.findBySender(currentUser);
         ArrayList<Message> messages = new ArrayList<Message>();
-        for (Message element : outgoing) {
-            if ((!element.isIsRemovedBySender()) && (!element.isDeletedBySender())) {
-                messages.add(element);
+        MessageForm messageForm = new MessageForm();
+        for (Message message : outgoing) {
+            if ((!message.isIsRemovedBySender()) && (!message.isDeletedBySender())) {
+                messages.add(message);
             }
         }
-        return messages;
+        messageForm.setMessageList(messages);
+        return messageForm;
     }
 
 }

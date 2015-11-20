@@ -1,9 +1,7 @@
 package mailoc.mvc;
 
-import mailoc.data.Message;
-import mailoc.data.MessageRepository;
-import mailoc.data.User;
-import mailoc.data.UserRepository;
+import mailoc.data.*;
+import mailoc.data.MessageForm;
 import mailoc.security.CurrentUser;
 import mailoc.security.SecurityUser;
 import mailoc.service.MessageService;
@@ -24,12 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.naming.NamingException;
 import javax.validation.Valid;
+import java.beans.PropertyEditorSupport;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -53,6 +53,7 @@ public class MainController {
 	public void setMessageService(MessageService messageService) {
 		MainController.messageService = messageService;
 	}
+
 
 	@RequestMapping(value = "/index", method = RequestMethod.GET)
 	public ModelAndView index(
@@ -108,8 +109,9 @@ public class MainController {
 	@RequestMapping(value = "/outgoing", method = RequestMethod.GET)
 	public ModelAndView listOutgoing(@CurrentUser User currentUser) {
 
-		Iterable <Message> messages = messageService.listOutgoing(currentUser);
-		return new ModelAndView("messages/outgoing", "messages", messages);
+		MessageForm messageForm = messageService.listOutgoing(currentUser);
+
+		return new ModelAndView("messages/outgoing", "messageForm", messageForm);
 	}
 
 	@RequestMapping(value = "/deleted", method = RequestMethod.GET)
@@ -135,16 +137,16 @@ public class MainController {
 
 	@RequestMapping(value = "/delete", method = RequestMethod.POST)
 	@Transactional
-	public ModelAndView deleteMessage(//@RequestParam(value = "id") Long id,
-									  @RequestParam("recycleCheckBox") String[] checkboxes, RedirectAttributes redirect,
+	public ModelAndView deleteMessage(@ModelAttribute("messageForm") MessageForm messageForm, Model model,
+									  RedirectAttributes redirect,
 									  @CurrentUser SecurityUser currentUser) {
+		List<Message> selectedList = messageForm.getMessageList(); //returns null
 
-		List<Long> ids = new ArrayList<>();
-		if (null != checkboxes) {
-			for (String id : checkboxes) {
-				ids.add(Long.parseLong(id));
-				Message message = messageRepository.findById(Long.parseLong(id));
-
+		if (selectedList == null) {
+			redirect.addAttribute("globalMessage", "Select messages to be deleted");
+		}
+		else {
+			for(Message message : selectedList) {
 				if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
 						&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
 					message.setIsRemovedByReceiver(true);
@@ -194,11 +196,8 @@ public class MainController {
 					return new ModelAndView("redirect:/deleted");
 				}
 			}
-		}
-		else {
-			return null;
-		}
-		return new ModelAndView("redirect:/incoming");
+			}
+		return new ModelAndView("redirect:/");
 	}
 
 	@RequestMapping(value = "/compose", method = RequestMethod.GET)
