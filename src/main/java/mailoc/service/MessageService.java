@@ -87,12 +87,13 @@ public class MessageService  {
 
     @Transactional
     public ArrayList<Message> searchByPattern (User currentUser, String pattern) {
-        Iterable<Message> allByPattern = messageRepository.findByReceiverOrSenderAndMessageTextOrSummaryContainingIgnoreCase(currentUser, currentUser, pattern, pattern);
+        ArrayList<Message> allByPattern = messageRepository.findByMessageTextOrSummaryContainingIgnoreCase(pattern, pattern);
         ArrayList<Message> messages = new ArrayList<Message>();
         for (Message element : allByPattern) {
-            messages.add(element);
+            if ((Objects.equals(element.getReceiver().getId(), currentUser.getId()))||(Objects.equals(element.getSender().getId(), currentUser.getId()))) {
+                messages.add(element);
+            }
         }
-
         Collections.sort(messages, Collections.reverseOrder());
         return messages;
     }

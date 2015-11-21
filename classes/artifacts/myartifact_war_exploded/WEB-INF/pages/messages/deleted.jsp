@@ -136,7 +136,13 @@
             <td>
               <input type="checkbox" name="toDelete[]" value="${message.id}" id="checkbox_${message.id}"/>
             </td>
-            <td>${message.sender.getUsername()}</td>
+            <td>
+              <a href="${rootURL}view?id=${message.id}">
+              <div style="height:100%;width:100%">
+                  ${message.receiver.getUsername()}
+              </div>
+            </a>
+            </td>
             <td>${message.summary}</td>
             <td>${message.messageText}</td>
             <td>${message.date}</td>

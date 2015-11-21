@@ -25,9 +25,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     @PostAuthorize("hasPermission(returnObject, 'read')")
     void delete (Long id);
 
-    Iterable<Message>findByReceiverOrSender(User id, User id2);
+    ArrayList<Message> findByReceiverOrSender(User id, User id2);
 
-    Iterable<Message>findByReceiverOrSenderAndMessageTextOrSummaryContainingIgnoreCase(User u1, User u2, String id, String id2);
-
-
+    ArrayList <Message> findByMessageTextOrSummaryContainingIgnoreCase(String id, String id2);
 }

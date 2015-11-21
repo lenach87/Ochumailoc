@@ -104,7 +104,7 @@ public class MainController {
 		return new ModelAndView("messages/view", "message", message);
 	}
 
-	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	@RequestMapping(value = "/search", method = {RequestMethod.GET, RequestMethod.POST} )
 	public ModelAndView searchIncoming (@CurrentUser User currentUser, @RequestParam(value = "pattern") String pattern) {
 		Iterable<Message> messages = messageService.searchByPattern(currentUser, pattern);
 		return new ModelAndView("messages/incoming", "messages", messages);
