@@ -82,44 +82,19 @@ public class MainController {
 
 	@RequestMapping(value = "/incoming", method = RequestMethod.GET)
 	public ModelAndView listIncoming(@CurrentUser User currentUser) {
-		Iterable<Message> incoming = messageRepository.findByReceiver(currentUser);
-		ArrayList<Message> messages = new ArrayList<Message>();
-		for (Message element : incoming) {
-			if (!element.isIsRemovedByReceiver() && !element.isDeletedByReceiver()) {
-				messages.add(element);
-			}
-		}
-		Collections.sort(messages, Collections.reverseOrder());
+		Iterable<Message> messages = messageService.listIncoming(currentUser);
 		return new ModelAndView("messages/incoming", "messages", messages);
 	}
 
 	@RequestMapping(value = "/outgoing", method = RequestMethod.GET)
 	public ModelAndView listOutgoing(@CurrentUser User currentUser) {
-
-		Iterable <Message> outgoing = messageRepository.findBySender(currentUser);
-		ArrayList<Message> messages = new ArrayList<Message>();
-		for (Message element : outgoing) {
-			if (!element.isIsRemovedBySender() && !element.isDeletedBySender()) {
-				messages.add(element);
-			}
-		}
-		Collections.sort(messages, Collections.reverseOrder());
+		Iterable<Message> messages = messageService.listOutgoing(currentUser);
 		return new ModelAndView("messages/outgoing", "messages", messages);
 	}
 
 	@RequestMapping(value = "/deleted", method = RequestMethod.GET)
 	public ModelAndView listDeleted(@CurrentUser User currentUser) {
-		Iterable<Message> allMessages = messageRepository.findByReceiverOrSender(currentUser, currentUser);
-		ArrayList<Message> deletedMessages = new ArrayList<Message>();
-		for (Message element : allMessages) {
-			if ((element.isIsRemovedBySender()) && (Objects.equals(element.getSender().getId(), currentUser.getId()))) {
-				deletedMessages.add(element);
-			}
-			if ((element.isIsRemovedByReceiver()) && (Objects.equals(element.getReceiver().getId(), currentUser.getId()))) {
-				deletedMessages.add(element);
-			}
-		}
-		Collections.sort(deletedMessages, Collections.reverseOrder());
+		Iterable<Message> deletedMessages = messageService.listDeleted(currentUser);
 		return new ModelAndView("messages/deleted", "deletedMessages", deletedMessages);
 	}
 
@@ -131,95 +106,44 @@ public class MainController {
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public ModelAndView searchIncoming (@CurrentUser User currentUser, @RequestParam(value = "pattern") String pattern) {
-		Iterable<Message> allByPattern = messageRepository.findByMessageTextOrSummaryContainingIgnoreCase(pattern, pattern);
-		ArrayList<Message> messages = new ArrayList<Message>();
-		for (Message element : allByPattern) {
-				messages.add(element);
-		}
-
-		Collections.sort(messages, Collections.reverseOrder());
+		Iterable<Message> messages = messageService.searchByPattern(currentUser, pattern);
 		return new ModelAndView("messages/incoming", "messages", messages);
 	}
 
-	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	@RequestMapping(value = "/delete_incoming", method = RequestMethod.POST)
 	@Transactional
-	public ModelAndView deleteMessage(//@ModelAttribute("messageForm") MessageForm messageForm, Model model,
-									  // @RequestParam(value = "messageIds") String[] messageIds,
-									  HttpServletRequest request,
-									  RedirectAttributes redirect,
-									  @CurrentUser SecurityUser currentUser) {
+	public ModelAndView deleteIncoming(@RequestParam(value = "toDelete[]", required = false) Long[] toDelete,
+									   RedirectAttributes redirect,
+									   @CurrentUser SecurityUser currentUser) {
 
-
-		final String[] checkboxes = request.getParameterValues("messageIds");
-		List<Long> ids = new ArrayList<>();
-		if (null != checkboxes) {
-			for (String s : checkboxes) {
-				ids.add(Long.parseLong(s));
-			}
+		if (toDelete != null) {
+			messageService.deleteIncoming(toDelete, currentUser);
 		}
 
-		List<Message> selectedList = new ArrayList<Message> ();
-		for (Long id:ids) {
-			selectedList.add(messageRepository.findById(id));
+		return new ModelAndView("redirect:/incoming");
+	}
+
+	@RequestMapping(value = "/delete_outgoing", method = RequestMethod.POST)
+	@Transactional
+	public ModelAndView deleteOutgoing(@RequestParam(value = "toDelete[]", required = false) Long[] toDelete,
+									   RedirectAttributes redirect,
+									   @CurrentUser SecurityUser currentUser) {
+		if (toDelete != null) {
+			messageService.deleteOutgoing(toDelete, currentUser);
 		}
+		return new ModelAndView("redirect:/outgoing");
 
-		if (selectedList.isEmpty()) {
-			return new ModelAndView("redirect:/deleted");
+	}
+
+	@RequestMapping(value = "/delete_removed", method = RequestMethod.POST)
+	@Transactional
+	public ModelAndView deleteRemoved (@RequestParam(value = "toDelete[]", required = false) Long[] toDelete,
+									   RedirectAttributes redirect,
+									   @CurrentUser SecurityUser currentUser) {
+		if (toDelete != null) {
+			messageService.deleteRemoved(toDelete, currentUser);
 		}
-		else {
-			for(Message message : selectedList) {
-				if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
-						&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
-					message.setIsRemovedByReceiver(true);
-					message.setIsRemovedBySender(true);
-					messageRepository.saveAndFlush(message);
-					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-					return new ModelAndView("redirect:/incoming");
-				} else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))
-						&& (Objects.equals(message.getReceiver().getId(), message.getSender().getId()))) {
-
-					messageRepository.delete(message);
-
-					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-					return new ModelAndView("redirect:/deleted");
-				}
-
-				if ((!message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
-					message.setIsRemovedByReceiver(true);
-					messageRepository.saveAndFlush(message);
-					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-					return new ModelAndView("redirect:/incoming");
-				} else if ((message.isIsRemovedByReceiver()) && (Objects.equals(message.getReceiver().getId(), currentUser.getId()))) {
-					message.setIsRemovedByReceiver(false);
-					message.setDeletedByReceiver(true);
-					message = messageRepository.saveAndFlush(message);
-					if ((message.isDeletedBySender()) && (message.isDeletedByReceiver())) {
-						messageRepository.delete(message);
-					}
-					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-					return new ModelAndView("redirect:/deleted");
-				}
-
-				if ((!message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId()))) {
-					message.setIsRemovedBySender(true);
-					messageRepository.saveAndFlush(message);
-					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-					return new ModelAndView("redirect:/outgoing");
-				}
-				else //((message.isIsRemovedBySender()) && (Objects.equals(message.getSender().getId(), currentUser.getId())))
-					{
-					message.setIsRemovedBySender(false);
-					message.setDeletedBySender(true);
-					message = messageRepository.saveAndFlush(message);
-					if ((message.isDeletedBySender()) && (message.isDeletedByReceiver())) {
-						messageRepository.delete(message);
-					}
-					redirect.addFlashAttribute("globalMessage", "Message removed successfully");
-					return new ModelAndView("redirect:/deleted");
-				}
-			}
-		}
-		return new ModelAndView("redirect:/");
+		return new ModelAndView("redirect:/deleted");
 	}
 
 	@RequestMapping(value = "/compose", method = RequestMethod.GET)
@@ -236,35 +160,11 @@ public class MainController {
 								ModelMap model, RedirectAttributes redirect) {
 
 
-			model.addAttribute("receiverName",messageForm.getReceiverName());
-			model.addAttribute("summary",messageForm.getSummary());
-			model.addAttribute("messageText",messageForm.getMessageText());
+		model.addAttribute("receiverName",messageForm.getReceiverName());
+		model.addAttribute("summary",messageForm.getSummary());
+		model.addAttribute("messageText",messageForm.getMessageText());
 
-		User to = userRepository.findUserByUsername(messageForm.getReceiverName());
-		if (to == null) {
-			result.rejectValue("receiverName", "receiverName", "User not found");
-		}
-		if (result.hasErrors()) {
-			return new ModelAndView("messages/compose");
-		}
-
-		Message message = new Message();
-		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		Date date = new Date();
-		String messageDate = dateFormat.format(date);
-		message.setSummary(messageForm.getSummary());
-		message.setMessageText(messageForm.getMessageText());
-		message.setDate(messageDate);
-		message.setReceiver(to);
-		message.setSenderName(currentUser.getUsername());
-		message.setReceiverName(to.getUsername());
-		message.setSender(currentUser);
-		message.setIsRemovedBySender(false);
-		message.setIsRemovedByReceiver(false);
-		message.setDeletedByReceiver(false);
-		message.setDeletedBySender(false);
-		message = messageRepository.save(message);
-//
+		Message message = messageService.compose(currentUser, messageForm);
 		redirect.addFlashAttribute("globalMessage", "Message added successfully");
 		return new ModelAndView("messages/view", "message", message);
 	}

@@ -100,7 +100,7 @@
       </c:if>
       <h2 class="sub-header">Outgoing messages</h2>
       <div class="table-responsive">
-        <form class="form-inline" action="${rootURL}delete" method="post">
+        <form class="form-inline" action="${rootURL}delete_outgoing" method="post">
         <table class="table table-striped">
           <colgroup>
             <col span="1" style="width: 8%;">
@@ -133,8 +133,8 @@
           <tbody>
           <tr>
             <td>
-              <input type = "checkbox" name = "messageIds" value = "${message.id}" /> <c:out value = " " />
-</td>
+              <input type="checkbox" name="toDelete[]" value="${message.id}" id="checkbox_${message.id}"/>
+            </td>
             <td>
               <a href="${rootURL}view?id=${message.id}">
                 <div style="height:100%;width:100%">
@@ -157,6 +157,16 @@
     </div>
   </div>
 </div>
+<script>
+  $('.dropdown-toggle').dropdown();
 
+  $('#delete_message').click(function(){
+    var data = { 'toDelete[]' : []};
+    $(":checked").each(function() {
+      data['toDelete[]'].push($(this).val());
+    });
+    $.post("/delete", data);
+  });
+</script>
 </body>
 </html>

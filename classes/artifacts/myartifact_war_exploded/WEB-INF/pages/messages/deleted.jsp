@@ -102,7 +102,7 @@
 
       <h2 class="sub-header">Deleted messages</h2>
       <div class="table-responsive">
-        <form class="form-inline" action="${rootURL}delete" method="post">
+        <form class="form-inline" action="${rootURL}delete_removed" method="post">
         <table class="table table-striped">
           <colgroup>
             <col span="1" style="width: 8%;">
@@ -134,7 +134,7 @@
           <tbody>
           <tr>
             <td>
-              <input type = "checkbox" name = "messageIds" value = "${message.id}" /> <c:out value = " " />
+              <input type="checkbox" name="toDelete[]" value="${message.id}" id="checkbox_${message.id}"/>
             </td>
             <td>${message.sender.getUsername()}</td>
             <td>${message.summary}</td>
@@ -152,6 +152,16 @@
     </div>
   </div>
 </div>
+<script>
+  $('.dropdown-toggle').dropdown();
 
+  $('#delete_message').click(function(){
+    var data = { 'toDelete[]' : []};
+    $(":checked").each(function() {
+      data['toDelete[]'].push($(this).val());
+    });
+    $.post("/delete", data);
+  });
+</script>
 </body>
 </html>

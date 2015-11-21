@@ -84,7 +84,7 @@
 
                     <h5> Enjoy yourself with OChuMail! </h5>
                     <p>
-                        <a class="btn btn-lg btn-primary" href="${pageContext.request.contextPath}incoming" role="button">Mailbox</a>
+                        <a class="btn btn-lg btn-primary" href="${rootURL}incoming" role="button">Mailbox</a>
                     </p>
 
             </div>

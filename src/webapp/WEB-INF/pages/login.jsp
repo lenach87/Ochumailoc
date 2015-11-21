@@ -42,7 +42,7 @@
           <li><a href="${rootURL}contacts">Contacts</a></li>
         </c:if>
         <c:if test="${not empty pageContext.request.userPrincipal}">
-          <li><a href="${rootURL}contacts">Contacts</a></li>
+          <li><a href="${rootURL}incoming">Mailbox</a></li>
           <form class="navbar-form navbar-right" action='${rootURL}logout' method='POST'>
             <button type="submit" class="btn btn-primary">
               <span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
@@ -124,7 +124,7 @@
 
             <h5> Enjoy yourself with OChuMail! </h5>
             <p>
-              <a class="btn btn-lg btn-primary" href="${pageContext.request.contextPath}incoming" role="button">Mailbox</a>
+              <a class="btn btn-lg btn-primary" href="${rootURL}incoming" role="button">Mailbox</a>
             </p>
 
           </c:if>
