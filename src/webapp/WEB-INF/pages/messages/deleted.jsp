@@ -84,7 +84,16 @@
   <div class="row">
     <div class="col-sm-3 col-md-2 sidebar">
       <ul class="nav nav-sidebar">
-        <li><a href="${rootURL}compose">Compose <span class="sr-only">(current)</span></a></li>
+        <p>  </p>
+        <li>
+          <form class="form-inline" action='${rootURL}compose' method='GET' style="text-indent:15px">
+            <button type="submit" class="btn btn-success">
+              <span class="glyphicon glyphicon-pencil" aria-hidden="true"> </span>
+              Compose
+            </button>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+          </form>
+        </li>
         <li><a href="${rootURL}incoming">Incoming</a></li>
         <li><a href="${rootURL}outgoing">Outgoing</a></li>
         <li class="active"><a href="${rootURL}deleted">Deleted</a></li>
