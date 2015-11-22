@@ -182,25 +182,31 @@ public class MessageService  {
     public Message compose (User currentUser, Message messageForm) {
 
         User to = userRepository.findUserByUsername(messageForm.getReceiverName());
+        if (to == null) {
+            return null;
+        }
 
-        Message message = new Message();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = new Date();
-        String messageDate = dateFormat.format(date);
-        message.setSummary(messageForm.getSummary());
-        message.setMessageText(messageForm.getMessageText());
-        message.setDate(messageDate);
-        message.setReceiver(to);
-        message.setSenderName(currentUser.getUsername());
-        message.setReceiverName(to.getUsername());
-        message.setSender(currentUser);
-        message.setIsRemovedBySender(false);
-        message.setIsRemovedByReceiver(false);
-        message.setDeletedByReceiver(false);
-        message.setDeletedBySender(false);
-        message = messageRepository.save(message);
-//
-      return message;
+        else {
+
+            Message message = new Message();
+            DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = new Date();
+            String messageDate = dateFormat.format(date);
+            message.setSummary(messageForm.getSummary());
+            message.setMessageText(messageForm.getMessageText());
+            message.setDate(messageDate);
+            message.setReceiver(to);
+            message.setSenderName(currentUser.getUsername());
+            message.setReceiverName(to.getUsername());
+            message.setSender(currentUser);
+            message.setIsRemovedBySender(false);
+            message.setIsRemovedByReceiver(false);
+            message.setDeletedByReceiver(false);
+            message.setDeletedBySender(false);
+            message = messageRepository.save(message);
+            return message;
+
+        }
     }
 
 }

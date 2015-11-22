@@ -156,17 +156,24 @@ public class MainController {
 
 	@RequestMapping(value = "/compose", method = RequestMethod.POST)
 	@Transactional
-	public ModelAndView compose(@CurrentUser User currentUser, @ModelAttribute("messageForm") @Valid Message messageForm, BindingResult result,
+	public ModelAndView compose(@CurrentUser User currentUser, @ModelAttribute("messageForm") @Valid Message messageForm,
+								BindingResult result,
 								ModelMap model, RedirectAttributes redirect) {
 
 
-		model.addAttribute("receiverName",messageForm.getReceiverName());
-		model.addAttribute("summary",messageForm.getSummary());
-		model.addAttribute("messageText",messageForm.getMessageText());
+			model.addAttribute("receiverName", messageForm.getReceiverName());
+			model.addAttribute("summary", messageForm.getSummary());
+			model.addAttribute("messageText", messageForm.getMessageText());
 
-		Message message = messageService.compose(currentUser, messageForm);
-		redirect.addFlashAttribute("globalMessage", "Message added successfully");
-		return new ModelAndView("messages/view", "message", message);
+		if (messageService.compose(currentUser, messageForm)!=null) {
+			Message message = messageService.compose(currentUser, messageForm);
+			redirect.addFlashAttribute("globalMessage", "Message added successfully");
+			return new ModelAndView("messages/view", "message", message);
+		}
+		else {
+			result.rejectValue("receiverName", "receiverName", "User not found. If you do not know anyone, try sending to me, lenachu");
+			return new ModelAndView("messages/compose");
+		}
 	}
 
 	@RequestMapping(value = "/reply", method = RequestMethod.GET)
