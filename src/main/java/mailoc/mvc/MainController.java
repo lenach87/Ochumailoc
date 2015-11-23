@@ -167,6 +167,7 @@ public class MainController {
 
 		if (messageService.compose(currentUser, messageForm)!=null) {
 			Message message = messageService.compose(currentUser, messageForm);
+			message=messageRepository.save(message);
 			redirect.addFlashAttribute("globalMessage", "Message added successfully");
 			return new ModelAndView("messages/view", "message", message);
 		}

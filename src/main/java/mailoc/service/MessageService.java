@@ -203,7 +203,7 @@ public class MessageService  {
             message.setIsRemovedByReceiver(false);
             message.setDeletedByReceiver(false);
             message.setDeletedBySender(false);
-            message = messageRepository.save(message);
+        //    message = messageRepository.save(message);
             return message;
 
         }
