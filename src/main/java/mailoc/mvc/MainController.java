@@ -5,6 +5,7 @@ import mailoc.security.CurrentUser;
 import mailoc.security.SecurityUser;
 import mailoc.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -105,8 +106,8 @@ public class MainController {
 	}
 
 	@RequestMapping(value = "/search", method = {RequestMethod.GET, RequestMethod.POST} )
-	public ModelAndView searchIncoming (@CurrentUser User currentUser, @RequestParam(value = "pattern") String pattern) {
-		Iterable<Message> messages = messageService.searchByPattern(currentUser, pattern);
+	public ModelAndView searchIncoming (@RequestParam(value = "pattern") String pattern, @CurrentUser User currentUser) {
+		Iterable<Message> messages = messageService.searchByPattern(pattern, currentUser);
 		return new ModelAndView("messages/incoming", "messages", messages);
 	}
 

@@ -2,7 +2,9 @@ package mailoc.data;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +29,8 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     ArrayList<Message> findByReceiverOrSender(User id, User id2);
 
-    ArrayList <Message> findByMessageTextOrSummaryContainingIgnoreCase(String id, String id2);
+
+    @Query("select f from Message f where LOWER (f.messageText) LIKE LOWER(CONCAT('%',:pattern, '%')) OR\n" +
+            "LOWER(f.summary) LIKE LOWER(CONCAT('%',:pattern, '%'))")
+    ArrayList <Message> findByPattern(@Param("pattern") String pattern);
 }

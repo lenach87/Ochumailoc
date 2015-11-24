@@ -9,6 +9,7 @@ import mailoc.data.UserRepository;
 import mailoc.security.CurrentUser;
 import mailoc.security.SecurityUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,8 +87,8 @@ public class MessageService  {
     }
 
     @Transactional
-    public ArrayList<Message> searchByPattern (User currentUser, String pattern) {
-        ArrayList<Message> allByPattern = messageRepository.findByMessageTextOrSummaryContainingIgnoreCase(pattern, pattern);
+    public ArrayList<Message> searchByPattern (String pattern, User currentUser) {
+        ArrayList<Message> allByPattern = messageRepository.findByPattern(pattern, pattern);
         ArrayList<Message> messages = new ArrayList<Message>();
         for (Message element : allByPattern) {
             if ((Objects.equals(element.getReceiver().getId(), currentUser.getId()))||(Objects.equals(element.getSender().getId(), currentUser.getId()))) {
