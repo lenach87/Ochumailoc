@@ -88,7 +88,7 @@ public class MessageService  {
 
     @Transactional
     public ArrayList<Message> searchByPattern (String pattern, User currentUser) {
-        ArrayList<Message> allByPattern = messageRepository.findByPattern(pattern, pattern);
+        ArrayList<Message> allByPattern = messageRepository.findByPattern(pattern);
         ArrayList<Message> messages = new ArrayList<Message>();
         for (Message element : allByPattern) {
             if ((Objects.equals(element.getReceiver().getId(), currentUser.getId()))||(Objects.equals(element.getSender().getId(), currentUser.getId()))) {
